@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ICI-Guard · 免疫双哨兵管理平台</title>
+<style>
+:root{
+  --bg:#eef3f7;
+  --panel:#ffffff;
+  --panel-2:#f7fafc;
+  --stroke:#d9e4ec;
+  --text:#0e2433;
+  --muted:#688092;
+  --teal:#0d7f87;
+  --teal-2:#14a1a8;
+  --blue:#3d69ff;
+  --gold:#d6a44f;
+  --rose:#da6f7d;
+  --green:#2d9f74;
+  --orange:#eb8b3b;
+  --shadow:0 22px 60px rgba(15,47,65,.10);
+  --shadow-sm:0 10px 24px rgba(15,47,65,.08);
+  --radius:22px;
+  --radius-sm:16px;
+  --grad:linear-gradient(135deg,#0a3d52 0%, #0d7f87 45%, #78b8c6 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:
+ radial-gradient(circle at 15% 10%, rgba(27,133,147,.10), transparent 24%),
+ radial-gradient(circle at 85% 0%, rgba(61,105,255,.09), transparent 22%),
+ linear-gradient(180deg, #f6f9fb 0%, #edf3f7 100%);
+color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button,input,select,textarea{font:inherit}
+.shell{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;padding:22px 18px 18px;
+  background:rgba(8,33,47,.95);backdrop-filter: blur(18px);
+  color:#dcebf1;border-right:1px solid rgba(255,255,255,.08)
+}
+.brand{
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:18px 18px 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 12px 30px rgba(0,0,0,.18)
+}
+.logo{
+  width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#8ed7df,#14a1a8 65%,#0d7f87);
+  display:grid;place-items:center;color:white;font-weight:800;letter-spacing:.04em;box-shadow:0 12px 28px rgba(20,161,168,.35)
+}
+.brand h1{font-size:20px;line-height:1.2;margin:12px 0 6px;color:#fff}
+.brand p{margin:0;color:#b8ced8;font-size:12px}
+.nav{margin-top:18px;display:grid;gap:10px}
+.nav a{
+  display:flex;gap:12px;align-items:flex-start;text-decoration:none;color:#d7e8ef;
+  padding:12px 14px;border-radius:16px;border:1px solid transparent
+}
+.nav a:hover,.nav a.active{
+  background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.10)
+}
+.nav b{display:block;font-size:13px;color:#fff}
+.nav span{display:block;font-size:11px;color:#aac0ca}
+.sidebar .mini{
+  margin-top:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;padding:14px
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.10);color:#eaf6fa;font-size:11px
+}
+.main{padding:22px}
+.hero{
+  background:var(--grad);border-radius:28px;padding:24px 24px 20px;color:#fff;
+  box-shadow:var(--shadow);position:relative;overflow:hidden
+}
+.hero:before,.hero:after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none
+}
+.hero:before{width:260px;height:260px;right:-80px;top:-90px;background:radial-gradient(circle, rgba(255,255,255,.22), transparent 62%)}
+.hero:after{width:420px;height:420px;left:-180px;bottom:-240px;background:radial-gradient(circle, rgba(255,255,255,.10), transparent 62%)}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;position:relative;z-index:1}
+.hero h2{margin:0;font-size:30px;letter-spacing:-.02em}
+.hero p{margin:8px 0 0;color:#dff5f7;max-width:780px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hero-card{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.16);backdrop-filter: blur(8px);
+  border-radius:20px;padding:14px 16px
+}
+.hero-card .label{font-size:11px;color:#d8f0f3;text-transform:uppercase;letter-spacing:.08em}
+.hero-card .value{font-size:28px;font-weight:700;margin-top:6px}
+.top-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.action{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);color:#fff;
+  padding:10px 14px;border-radius:14px;cursor:pointer
+}
+.action.primary{background:#fff;color:#0b5861;font-weight:700}
+.section{margin-top:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{
+  background:rgba(255,255,255,.92);backdrop-filter: blur(10px);
+  border:1px solid rgba(213,226,235,.85);border-radius:var(--radius);box-shadow:var(--shadow-sm)
+}
+.kpi{padding:18px 18px 16px;position:relative;overflow:hidden}
+.kpi:after{
+  content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle, rgba(20,161,168,.10), transparent 70%)
+}
+.kpi .eyebrow{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.kpi .big{font-size:34px;font-weight:800;margin-top:8px;letter-spacing:-.03em}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.grid-2{display:grid;grid-template-columns:1.06fr .94fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.panel-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px 0
+}
+.panel-head h3{margin:0;font-size:18px}
+.panel-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.panel-body{padding:16px 20px 20px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+.field input,.field select,.field textarea{
+  width:100%;background:#fbfdff;border:1px solid var(--stroke);border-radius:14px;padding:12px 13px;color:var(--text)
+}
+.field input[type=range]{padding:0}
+.group{
+  margin-top:14px;padding-top:14px;border-top:1px dashed var(--stroke)
+}
+.group h4{margin:0 0 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  user-select:none;cursor:pointer;padding:10px 12px;border-radius:14px;background:#f7fafc;border:1px solid var(--stroke);
+  color:#335060;font-size:12px;transition:.2s
+}
+.chip.active{background:#e8f8f7;border-color:#8ad5d0;color:#0f6e76;box-shadow:0 4px 10px rgba(13,127,135,.08)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn{
+  border:1px solid var(--stroke);background:#fff;border-radius:14px;padding:11px 14px;cursor:pointer;color:var(--text)
+}
+.btn.primary{background:var(--grad);color:#fff;border:none;font-weight:700;box-shadow:0 12px 26px rgba(13,127,135,.20)}
+.btn.ghost{background:#f7fafc}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.preset{padding:9px 12px;border-radius:999px;border:1px solid var(--stroke);background:#fff;cursor:pointer}
+.dashboard{
+  display:grid;grid-template-columns:1fr;gap:16px
+}
+.duo{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px
+}
+.gauge-card{
+  border-radius:22px;padding:18px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--stroke)
+}
+.gauge-wrap{display:flex;gap:16px;align-items:center}
+.gauge{
+  width:136px;height:136px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--gcolor) calc(var(--val)*1%), #ebf1f5 0);position:relative;flex:0 0 auto
+}
+.gauge:before{
+  content:"";position:absolute;inset:14px;border-radius:50%;background:#fff;border:1px solid #e7edf2
+}
+.gauge > div{position:relative;text-align:center;z-index:1}
+.gauge .num{font-size:34px;font-weight:800;line-height:1}
+.gauge .cap{font-size:11px;color:var(--muted);margin-top:6px}
+.gauge-note{font-size:13px;color:var(--muted)}
+.band{font-weight:700;font-size:18px}
+.driver-list{display:grid;gap:8px;margin-top:14px}
+.driver{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:11px 12px;border:1px solid var(--stroke);border-radius:14px;background:#fcfeff
+}
+.driver small{display:block;color:var(--muted);font-size:11px}
+.driver strong{font-size:14px}
+.status-pill{
+  display:inline-flex;gap:6px;align-items:center;padding:7px 10px;border-radius:999px;
+  font-size:11px;font-weight:700
+}
+.status-low{background:#ecf8f1;color:#1e815a}
+.status-mid{background:#fff5e7;color:#ab6b18}
+.status-high{background:#fff0f2;color:#b94959}
+.matrix-wrap{
+  position:relative;background:linear-gradient(180deg,#fff,#fbfdff);
+  border:1px solid var(--stroke);border-radius:24px;padding:18px
+}
+.matrix-sub{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+svg text{font-family:inherit}
+.canvas-card,.evidence-card,.task,.report,.table-card{
+  background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--stroke);border-radius:22px
+}
+.canvas-card{padding:16px}
+.evidence-card{padding:16px}
+.evidence-level{
+  display:inline-flex;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:8px
+}
+.lv-std{background:#eaf2ff;color:#3057c8}
+.lv-rwe{background:#e8f8f7;color:#0d7f87}
+.lv-exp{background:#fff3e7;color:#b86c16}
+.tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.task{padding:16px}
+.task h4,.evidence-card h4,.report h4,.table-card h4{margin:0 0 8px}
+.task p,.evidence-card p,.report p{margin:0;color:var(--muted);font-size:13px}
+.report{padding:16px;display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+textarea.report-box{
+  min-height:220px;border:1px solid var(--stroke);border-radius:18px;padding:14px;background:#fbfdff;resize:vertical
+}
+.info-list{display:grid;gap:10px}
+.info{
+  padding:12px 14px;border-radius:16px;border:1px solid var(--stroke);background:#fff
+}
+.info strong{display:block;margin-bottom:4px}
+.table-card{padding:16px}
+.mini-table{width:100%;border-collapse:collapse;font-size:13px}
+.mini-table th,.mini-table td{padding:12px;border-bottom:1px solid #edf2f5;text-align:left}
+.mini-table th{color:var(--muted);font-weight:700}
+.progress{
+  height:9px;background:#ebf1f5;border-radius:999px;overflow:hidden
+}
+.progress > span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#3d69ff,#14a1a8)}
+.footer-note{
+  margin-top:18px;padding:16px 18px;border-radius:20px;border:1px solid var(--stroke);background:#fff;color:var(--muted)
+}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{
+  padding:10px 12px;border-radius:14px;border:1px solid var(--stroke);background:#fff;cursor:pointer
+}
+.tab.active{background:#eef7ff;border-color:#c7d8f5;color:#2c59ca;font-weight:700}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+.mobile-head{display:none}
+.shell.focus-mode{grid-template-columns:1fr}
+.shell.focus-mode .sidebar,.shell.focus-mode .presets,.shell.focus-mode .toolbar{display:none!important}
+@media (max-width:1180px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.report,.hero-grid{grid-template-columns:1fr}
+  .tasks,.grid-3,.duo{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mobile-head{display:block;margin-bottom:16px}
+  .main{padding:16px}
+  .form-grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">IG</div>
+      <h1>ICI-Guard</h1>
+      <p>肿瘤免疫治疗安全—获益协同管理平台</p>
+      <div style="margin-top:12px" class="badge">本地工作站</div>
+    </div>
+    <nav class="nav">
+      <a class="active" href="#overview"><div>◉</div><div><b>总览首页</b><span>平台状态与核心能力</span></div></a>
+      <a href="#input"><div>◎</div><div><b>患者录入</b><span>结构化录入与场景模板</span></div></a>
+      <a href="#matrix"><div>◌</div><div><b>双哨兵矩阵</b><span>非补偿式风险—获益双轴</span></div></a>
+      <a href="#timeline"><div>◍</div><div><b>动态轨迹</b><span>时间变化与纵向管理</span></div></a>
+      <a href="#evidence"><div>◐</div><div><b>证据中心</b><span>真实世界证据 / 临床标准 / 探索扩展</span></div></a>
+      <a href="#report"><div>◓</div><div><b>报告中心</b><span>综合评估与随访摘要</span></div></a>
+    </nav>
+    <div class="mini">
+      <div style="font-size:12px;color:#aac0ca">平台能力</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-top:6px">ICI全周期双轴协同管理</div>
+      <div style="margin-top:10px;font-size:12px;color:#b8ced8">
+        • 多源信号结构化整合<br>
+        • 风险与获益独立解读<br>
+        • 证据分级与路径追溯
+      </div>
+    </div>
+    <div class="mini">
+      <div style="font-size:12px;color:#aac0ca">核心原则</div>
+      <div style="margin-top:8px" class="badge">安全优先 · 非补偿式双轴</div>
+      <div style="margin-top:10px;font-size:12px;color:#b8ced8">
+        获益信号可以与高风险并存，但绝不能抵消高风险安全信号。
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-head">
+      <div class="card" style="padding:16px 18px">
+        <b>ICI-Guard</b> · 免疫双哨兵管理平台
+      </div>
+    </div>
+
+    <section id="overview" class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="badge" style="background:rgba(255,255,255,.18)">肿瘤免疫治疗全周期管理</div>
+          <h2>免疫双哨兵 · 安全—获益协同管理平台</h2>
+          <p>
+            面向肿瘤免疫治疗全周期管理，将 <b>风险哨兵</b> 与 <b>获益哨兵</b> 设计为相互独立、持续扩展的双轴系统。
+            当前系统通过结构化患者画像、动态信号与分级证据形成可解释的双轴辅助评估，并支持随访路径与结果回流。
+          </p>
+          <div class="hero-meta">
+            <span class="badge">非补偿式双轴</span>
+            <span class="badge">可解释评估引擎</span>
+            <span class="badge">证据分级追溯</span>
+            <span class="badge">医院端协同管理</span>
+          </div>
+        </div>
+        <div>
+          <div class="top-actions">
+            <button class="action" id="focusModeBtn">专注模式</button>
+            <button class="action" id="copySummaryBtn">复制摘要</button>
+            <button class="action primary" id="runNowTop">立即运行</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+            <div class="hero-card">
+              <div class="label">服务对象</div>
+              <div class="value">医院端</div>
+              <div style="font-size:12px;color:#e4f5f7">面向肿瘤科、临床药学部门与随访团队</div>
+            </div>
+            <div class="hero-card">
+              <div class="label">证据架构</div>
+              <div class="value">多层融合</div>
+              <div style="font-size:12px;color:#e4f5f7">以MG/白癜风为锚点，持续扩展心肌炎、影像、ctDNA等</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section kpis">
+      <div class="card kpi">
+        <div class="eyebrow">风险哨兵</div>
+        <div class="big" id="kpiRisk">28</div>
+        <div class="sub">当前风险关注指数</div>
+      </div>
+      <div class="card kpi">
+        <div class="eyebrow">获益哨兵</div>
+        <div class="big" id="kpiBenefit">24</div>
+        <div class="sub">当前获益证据指数</div>
+      </div>
+      <div class="card kpi">
+        <div class="eyebrow">数据完整度</div>
+        <div class="big" id="kpiComplete">61%</div>
+        <div class="sub">支撑证据透明呈现</div>
+      </div>
+      <div class="card kpi">
+        <div class="eyebrow">当前优先级</div>
+        <div class="big" id="kpiPriority">常规</div>
+        <div class="sub">当前记录的随访层级</div>
+      </div>
+    </section>
+
+    <section class="section grid-2">
+      <div class="card" id="input">
+        <div class="panel-head">
+          <div>
+            <h3>患者录入工作台</h3>
+            <p>支持典型患者场景模板与自由输入，录入后系统实时更新双轴评估、时间轴与随访任务。</p>
+          </div>
+          <div class="badge" style="color:#0d7f87;background:#e8f8f7;border-color:#cfeeea">可交互输入</div>
+        </div>
+        <div class="panel-body">
+          <div class="presets">
+            <button class="preset" data-preset="stable">稳定随访</button>
+            <button class="preset" data-preset="benefit">潜在获益</button>
+            <button class="preset" data-preset="risk">MG高危</button>
+            <button class="preset" data-preset="dual">风险 + 获益并存</button>
+            <button class="preset" data-preset="complex">复杂多信号</button>
+          </div>
+
+          <div class="form-grid" style="margin-top:16px">
+            <div class="field"><label>患者编号</label><input id="patientId" value="IG-2026-001"/></div>
+            <div class="field"><label>医院 / 中心</label><input id="center" value="肿瘤日间治疗中心"/></div>
+            <div class="field"><label>ICI方案</label>
+              <select id="ici">
+                <option value="PD-1">PD-1 抑制剂</option>
+                <option value="PD-L1">PD-L1 抑制剂</option>
+                <option value="CTLA-4">CTLA-4 抑制剂</option>
+                <option value="PD-1+CTLA-4">PD-1 + CTLA-4 联合</option>
+                <option value="LAG-3 combo">LAG-3 联合方案</option>
+              </select>
+            </div>
+            <div class="field"><label>肿瘤类型</label>
+              <select id="tumor">
+                <option value="lung">肺癌</option>
+                <option value="melanoma">黑色素瘤</option>
+                <option value="thymoma">胸腺瘤</option>
+                <option value="urologic">泌尿系统肿瘤</option>
+                <option value="GI">消化系统肿瘤</option>
+                <option value="other">其他实体瘤</option>
+              </select>
+            </div>
+            <div class="field"><label>年龄</label><input id="age" type="number" min="18" max="100" value="63"/></div>
+            <div class="field"><label>体重（kg）</label><input id="weight" type="number" min="30" max="200" step="0.1" value="69.5"/></div>
+            <div class="field"><label>治疗天数</label><input id="day" type="range" min="0" max="365" value="48"/></div>
+            <div class="field"><label>当前周期</label><input id="cycle" type="number" min="1" max="30" value="4"/></div>
+            <div class="field"><label>影像学最佳疗效</label>
+              <select id="response">
+                <option value="NA">尚未评估</option>
+                <option value="CR">完全缓解（CR）</option>
+                <option value="PR">部分缓解（PR）</option>
+                <option value="SD">疾病稳定（SD）</option>
+                <option value="PD">疾病进展（PD）</option>
+              </select>
+            </div>
+            <div class="field"><label>ctDNA趋势</label>
+              <select id="ctdna">
+                <option value="NA">未检测</option>
+                <option value="down50">下降 ≥50%</option>
+                <option value="down">下降 10–49%</option>
+                <option value="stable">基本稳定</option>
+                <option value="up">上升</option>
+              </select>
+            </div>
+            <div class="field"><label>肿瘤标志物趋势</label>
+              <select id="marker">
+                <option value="NA">未纳入</option>
+                <option value="down">下降</option>
+                <option value="stable">稳定</option>
+                <option value="up">上升</option>
+              </select>
+            </div>
+            <div class="field"><label>ECOG趋势</label>
+              <select id="ecog">
+                <option value="stable">稳定</option>
+                <option value="improved">改善</option>
+                <option value="worse">恶化</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="group">
+            <h4>风险哨兵 · 症状信号</h4>
+            <div class="chips" id="symptomChips"></div>
+          </div>
+
+          <div class="group">
+            <h4>风险哨兵 · 实验室信号</h4>
+            <div class="chips" id="labChips"></div>
+          </div>
+
+          <div class="group">
+            <h4>免疫相关事件 / 扩展信号</h4>
+            <div class="chips" id="iraeChips"></div>
+          </div>
+
+          <div class="toolbar">
+            <button class="btn primary" id="runBtn">运行双哨兵评估</button>
+            <button class="btn ghost" id="resetBtn">重置</button>
+            <button class="btn" id="scenarioBtn">载入典型复杂场景</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard">
+        <div class="card">
+          <div class="panel-head">
+            <div>
+              <h3>双哨兵驾驶舱</h3>
+              <p>独立输出安全与获益两条结果，并保留每项驱动因素与证据层级。</p>
+            </div>
+            <div id="priorityPill" class="status-pill status-low">常规随访</div>
+          </div>
+          <div class="panel-body">
+            <div class="duo">
+              <div class="gauge-card">
+                <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">风险哨兵</div>
+                <div class="gauge-wrap" style="margin-top:10px">
+                  <div class="gauge" id="riskGauge" style="--val:28;--gcolor:#d86f7e">
+                    <div><div class="num" id="riskNum">28</div><div class="cap">指数</div></div>
+                  </div>
+                  <div>
+                    <div class="band" id="riskBand">低关注</div>
+                    <div class="gauge-note" id="riskDesc">当前安全信号有限，建议继续常规监测。</div>
+                    <div style="margin-top:10px" class="badge" id="riskBadge">安全优先始终保留</div>
+                  </div>
+                </div>
+                <div class="driver-list" id="riskDrivers"></div>
+              </div>
+
+              <div class="gauge-card">
+                <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">获益哨兵</div>
+                <div class="gauge-wrap" style="margin-top:10px">
+                  <div class="gauge" id="benefitGauge" style="--val:24;--gcolor:#3d69ff">
+                    <div><div class="num" id="benefitNum">24</div><div class="cap">指数</div></div>
+                  </div>
+                  <div>
+                    <div class="band" id="benefitBand">有限信号</div>
+                    <div class="gauge-note" id="benefitDesc">当前尚无强获益信号，仍需结合标准疗效评估。</div>
+                    <div style="margin-top:10px" class="badge" id="benefitBadge">获益信号不能抵消风险</div>
+                  </div>
+                </div>
+                <div class="driver-list" id="benefitDrivers"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="matrix">
+          <div class="panel-head">
+            <div>
+              <h3>安全—获益非补偿式矩阵</h3>
+              <p>平台核心创新点：即使获益证据增强，也不能抵消高风险安全信号。</p>
+            </div>
+            <div class="tabs">
+              <button class="tab active" data-tab="matrix">矩阵视图</button>
+              <button class="tab" data-tab="profile">患者概况</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="tabMatrix">
+              <div class="matrix-wrap">
+                <div class="matrix-sub">
+                  <div style="font-size:12px;color:var(--muted)">纵轴 = 风险关注度 ↑ &nbsp;&nbsp; 横轴 = 获益证据强度 ↑</div>
+                  <div class="badge" id="matrixTag">象限：低风险 / 获益有限</div>
+                </div>
+                <svg id="matrixSvg" viewBox="0 0 680 320" width="100%" height="320" aria-label="风险获益矩阵">
+                  <defs>
+                    <linearGradient id="q1" x1="0" x2="1"><stop offset="0%" stop-color="#fff1f3"/><stop offset="100%" stop-color="#fff9ef"/></linearGradient>
+                    <linearGradient id="q2" x1="0" x2="1"><stop offset="0%" stop-color="#fff1f3"/><stop offset="100%" stop-color="#eef6ff"/></linearGradient>
+                    <linearGradient id="q3" x1="0" x2="1"><stop offset="0%" stop-color="#f3fbf7"/><stop offset="100%" stop-color="#fffdf6"/></linearGradient>
+                    <linearGradient id="q4" x1="0" x2="1"><stop offset="0%" stop-color="#f3fbf7"/><stop offset="100%" stop-color="#eef6ff"/></linearGradient>
+                  </defs>
+                  <rect x="72" y="26" width="256" height="120" rx="20" fill="url(#q1)" stroke="#ecd3d8"/>
+                  <rect x="336" y="26" width="272" height="120" rx="20" fill="url(#q2)" stroke="#d9dff2"/>
+                  <rect x="72" y="154" width="256" height="120" rx="20" fill="url(#q3)" stroke="#d7ebe0"/>
+                  <rect x="336" y="154" width="272" height="120" rx="20" fill="url(#q4)" stroke="#dbe6f7"/>
+                  <line x1="336" y1="26" x2="336" y2="274" stroke="#c8d6df" stroke-dasharray="6 7"/>
+                  <line x1="72" y1="150" x2="608" y2="150" stroke="#c8d6df" stroke-dasharray="6 7"/>
+                  <text x="112" y="58" font-size="14" fill="#9f4b56" font-weight="700">高风险 · 获益有限</text>
+                  <text x="376" y="58" font-size="14" fill="#71612e" font-weight="700">双高并存 · 安全优先</text>
+                  <text x="112" y="186" font-size="14" fill="#2e7a5d" font-weight="700">低风险 · 获益有限</text>
+                  <text x="376" y="186" font-size="14" fill="#2f5dbb" font-weight="700">低风险 · 获益增强</text>
+                  <text x="322" y="307" font-size="13" fill="#7a909c">获益证据 →</text>
+                  <text transform="translate(28 186) rotate(-90)" font-size="13" fill="#7a909c">风险关注 →</text>
+                  <circle id="matrixPoint" cx="185" cy="210" r="15" fill="#0d7f87" stroke="#fff" stroke-width="5" filter="drop-shadow(0 6px 12px rgba(13,127,135,.28))"></circle>
+                  <text id="matrixLabel" x="208" y="214" font-size="14" font-weight="700" fill="#153643">R28 / B24</text>
+                </svg>
+              </div>
+            </div>
+            <div id="tabProfile" class="hidden">
+              <div class="grid-3">
+                <div class="table-card">
+                  <h4>信号构成</h4>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">当前记录的证据来源构成</div>
+                  <div style="display:grid;gap:12px">
+                    <div><div style="display:flex;justify-content:space-between;font-size:12px"><span>临床标准输入</span><span id="pStd">28%</span></div><div class="progress"><span id="barStd" style="width:28%"></span></div></div>
+                    <div><div style="display:flex;justify-content:space-between;font-size:12px"><span>真实世界锚点</span><span id="pRwe">47%</span></div><div class="progress"><span id="barRwe" style="width:47%;background:linear-gradient(90deg,#14a1a8,#76c7ca)"></span></div></div>
+                    <div><div style="display:flex;justify-content:space-between;font-size:12px"><span>探索性扩展</span><span id="pExp">25%</span></div><div class="progress"><span id="barExp" style="width:25%;background:linear-gradient(90deg,#d6a44f,#f1c678)"></span></div></div>
+                  </div>
+                </div>
+                <div class="table-card">
+                  <h4>当前记录</h4>
+                  <table class="mini-table">
+                    <tr><th>患者编号</th><td id="profPatient">IG-2026-001</td></tr>
+                    <tr><th>方案</th><td id="profRegimen">PD-1 抑制剂</td></tr>
+                    <tr><th>癌种</th><td id="profTumor">肺癌</td></tr>
+                    <tr><th>治疗天数</th><td id="profDay">48</td></tr>
+                    <tr><th>周期</th><td id="profCycle">4</td></tr>
+                  </table>
+                </div>
+                <div class="table-card">
+                  <h4>核心管理原则</h4>
+                  <div class="info-list">
+                    <div class="info"><strong>安全优先</strong> 高危信号独立保留，获益不能抵消风险</div>
+                    <div class="info"><strong>双轴解读</strong> 安全与获益分别计算、同步呈现</div>
+                    <div class="info"><strong>持续扩展</strong> 可纳入心肌炎、影像、ctDNA等更多信号</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid-2" id="timeline">
+      <div class="canvas-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div>
+            <h3 style="margin:0">动态轨迹</h3>
+            <div style="font-size:12px;color:var(--muted)">基于当前记录生成纵向辅助轨迹，用于观察风险与获益双轴随时间的变化。</div>
+          </div>
+          <div class="badge">风险 vs 获益</div>
+        </div>
+        <canvas id="trendCanvas" width="860" height="320" style="width:100%;height:auto;margin-top:10px"></canvas>
+      </div>
+
+      <div class="canvas-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div>
+            <h3 style="margin:0">临床时间轴</h3>
+            <div style="font-size:12px;color:var(--muted)">根据当前输入自动生成的随访叙事路径。</div>
+          </div>
+          <div class="badge">路径状态</div>
+        </div>
+        <div id="timelineList" style="display:grid;gap:12px;margin-top:14px"></div>
+      </div>
+    </section>
+
+    <section class="section" id="evidence">
+      <div class="card">
+        <div class="panel-head">
+          <div>
+            <h3>证据中心</h3>
+            <p>对每一类信号进行证据分级，避免将探索性关联误包装为成熟预测。</p>
+          </div>
+          <div class="badge" style="color:#0d7f87;background:#e8f8f7;border-color:#cfeeea">证据分级</div>
+        </div>
+        <div class="panel-body grid-3">
+          <div class="evidence-card">
+            <div class="evidence-level lv-rwe">真实世界证据</div>
+            <h4>风险锚点：ICI相关MG</h4>
+            <p id="ev1">当前系统基于ICI类别、癌种异质性、年龄/体重模式及共现逻辑构建风险锚点。</p>
+          </div>
+          <div class="evidence-card">
+            <div class="evidence-level lv-rwe">真实世界证据</div>
+            <h4>获益锚点：ICI相关白癜风</h4>
+            <p id="ev2">白癜风仅作为潜在获益相关信号处理，而非直接疗效替代终点。</p>
+          </div>
+          <div class="evidence-card">
+            <div class="evidence-level lv-std">临床标准</div>
+            <h4>影像与随访层</h4>
+            <p id="ev3">影像、肿瘤标志物和功能状态可在有数据时增强获益轴判断。</p>
+          </div>
+          <div class="evidence-card">
+            <div class="evidence-level lv-exp">探索性扩展</div>
+            <h4>ctDNA / 分子层扩展</h4>
+            <p id="ev4">分子动态作为扩展证据层纳入，不替代标准疗效终点。</p>
+          </div>
+          <div class="evidence-card">
+            <div class="evidence-level lv-exp">架构能力</div>
+            <h4>可扩展架构</h4>
+            <p id="ev5">平台架构支持持续纳入严重irAE、多模态标志物与多中心验证数据。</p>
+          </div>
+          <div class="evidence-card">
+            <div class="evidence-level lv-std">边界治理</div>
+            <h4>临床边界</h4>
+            <p id="ev6">本平台只输出关注等级、证据提示和随访任务，不进行自动诊断或自动处方。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="report">
+      <div class="report">
+        <div>
+          <h4>综合评估摘要</h4>
+          <textarea class="report-box" id="reportBox" readonly></textarea>
+        </div>
+        <div>
+          <h4>随访任务编排</h4>
+          <div class="tasks">
+            <div class="task">
+              <h4>当前任务</h4>
+              <p id="taskNow"></p>
+            </div>
+            <div class="task">
+              <h4>下一节点</h4>
+              <p id="taskNext"></p>
+            </div>
+            <div class="task">
+              <h4>数据回流</h4>
+              <p id="taskData"></p>
+            </div>
+          </div>
+
+          <div class="table-card" style="margin-top:14px">
+            <h4>本次评估要点</h4>
+            <div class="info-list">
+              <div class="info"><strong>双轴状态</strong> 风险与获益两类信息在同一患者视图中独立呈现。</div>
+              <div class="info"><strong>证据可追溯</strong> 每项驱动因素均保留证据层级与来源类别。</div>
+              <div class="info"><strong>持续扩展</strong> MG与白癜风作为首批锚点，可继续纳入更多风险与获益指标。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="table-card">
+        <h4>部署蓝图</h4>
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>模块</th>
+              <th>当前能力</th>
+              <th>近期升级方向</th>
+              <th>长期愿景</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>风险哨兵</td>
+              <td>MG锚点 + 共现逻辑</td>
+              <td>扩展心肌炎 / 肌炎 / 肺炎等</td>
+              <td>多中心验证的风险管理引擎</td>
+            </tr>
+            <tr>
+              <td>获益哨兵</td>
+              <td>白癜风 + 影像 / 标志物 / ctDNA 融合逻辑</td>
+              <td>融合RECIST / ctDNA</td>
+              <td>个体化动态获益证据图谱</td>
+            </tr>
+            <tr>
+              <td>医院工作流</td>
+              <td>随访计划与提醒叙事</td>
+              <td>肿瘤科 + 临床药学协同管理</td>
+              <td>研究 + 服务 + 部署一体化生态</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer-note">
+        <b>使用边界：</b> 本平台提供风险识别、证据整合与随访辅助。当前指数为可解释的辅助评估指标，不代表真实临床发生概率或疗效概率，不替代医师独立诊断、处方和治疗决策。
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  const state = {
+    symptoms:new Set(),
+    labs:new Set(),
+    iraes:new Set()
+  };
+  const LABELS = {
+    lung:'肺癌',melanoma:'黑色素瘤',thymoma:'胸腺瘤',urologic:'泌尿系统肿瘤',GI:'消化系统肿瘤',other:'其他实体瘤',
+    weakness:'近端肌无力 / 易疲劳',ptosis:'眼睑下垂 / 复视',dysphagia:'吞咽困难 / 构音异常',dyspnea:'呼吸困难',myalgia:'肌痛 / 肌无力加重',palpitation:'心悸 / 胸闷',
+    CK:'CK异常',troponin:'肌钙蛋白异常',LFT:'肝酶异常',thyroid:'甲功异常',
+    myositis:'肌炎',myocarditis:'心肌炎',pneumonitis:'肺炎',colitis:'结肠炎',vitiligo:'白癜风样改变',endocrine:'内分泌相关irAE'
+  };
+  const chipDefs = {
+    symptomChips:['weakness','ptosis','dysphagia','dyspnea','myalgia','palpitation'],
+    labChips:['CK','troponin','LFT','thyroid'],
+    iraeChips:['myositis','myocarditis','pneumonitis','colitis','vitiligo','endocrine']
+  };
+  const presets = {
+    stable:{ici:'PD-1',tumor:'lung',age:63,weight:69.5,day:48,cycle:4,symptoms:[],labs:[],iraes:[],response:'SD',ctdna:'stable',marker:'stable',ecog:'stable'},
+    benefit:{ici:'PD-1',tumor:'melanoma',age:56,weight:74,day:92,cycle:6,symptoms:[],labs:[],iraes:['vitiligo'],response:'PR',ctdna:'down50',marker:'down',ecog:'improved'},
+    risk:{ici:'PD-1',tumor:'thymoma',age:72,weight:56,day:34,cycle:3,symptoms:['weakness','ptosis','dysphagia'],labs:['CK'],iraes:['myositis'],response:'SD',ctdna:'stable',marker:'stable',ecog:'worse'},
+    dual:{ici:'PD-1',tumor:'melanoma',age:70,weight:58,day:51,cycle:4,symptoms:['weakness','dyspnea'],labs:['CK','troponin'],iraes:['vitiligo','myositis','myocarditis'],response:'PR',ctdna:'down',marker:'down',ecog:'stable'},
+    complex:{ici:'PD-1+CTLA-4',tumor:'urologic',age:68,weight:61,day:67,cycle:5,symptoms:['myalgia','palpitation'],labs:['troponin','thyroid'],iraes:['vitiligo','myocarditis','endocrine'],response:'PR',ctdna:'down',marker:'stable',ecog:'improved'}
+  };
+
+  function el(id){return document.getElementById(id);}
+  function initChips(){
+    for(const [boxId, arr] of Object.entries(chipDefs)){
+      const box = el(boxId);
+      box.innerHTML = '';
+      arr.forEach(key=>{
+        const div=document.createElement('button');
+        div.type='button';
+        div.className='chip';
+        div.textContent=LABELS[key];
+        div.dataset.key=key;
+        div.addEventListener('click',()=>{
+          const target = boxId==='symptomChips' ? state.symptoms : boxId==='labChips' ? state.labs : state.iraes;
+          if(target.has(key)){target.delete(key);div.classList.remove('active')}
+          else {target.add(key);div.classList.add('active')}
+          update();
+        });
+        box.appendChild(div);
+      });
+    }
+  }
+  function setChipState(){
+    [['symptomChips',state.symptoms],['labChips',state.labs],['iraeChips',state.iraes]].forEach(([boxId,set])=>{
+      Array.from(el(boxId).children).forEach(node=>node.classList.toggle('active', set.has(node.dataset.key)));
+    });
+  }
+  function read(){
+    const data = {
+      patientId:el('patientId').value.trim()||'IG-2026-001',
+      center:el('center').value.trim()||'肿瘤日间治疗中心',
+      ici:el('ici').value,
+      tumor:el('tumor').value,
+      age:Math.max(18,Math.min(100, Number(el('age').value)||63)),
+      weight:Math.max(30,Math.min(200, Number(el('weight').value)||70)),
+      day:Math.max(0,Math.min(365, Number(el('day').value)||0)),
+      cycle:Math.max(1,Math.min(30, Number(el('cycle').value)||1)),
+      response:el('response').value,
+      ctdna:el('ctdna').value,
+      marker:el('marker').value,
+      ecog:el('ecog').value,
+      symptoms:[...state.symptoms],
+      labs:[...state.labs],
+      iraes:[...state.iraes]
+    };
+    return data;
+  }
+
+  function score(p){
+    let risk=8, benefit=14;
+    const rd=[], bd=[];
+    const addR=(label,w,tier='真实世界证据')=>{risk+=w;rd.push({label,w,tier});};
+    const addB=(label,w,tier='探索扩展')=>{benefit+=w;bd.push({label,w,tier});};
+
+    addR(`${p.ici} 治疗背景`, {'PD-1':6,'PD-L1':5,'CTLA-4':4,'PD-1+CTLA-4':10,'LAG-3 combo':4}[p.ici] || 3, '真实世界证据');
+    addR(`${LABELS[p.tumor]} 异质性背景`, {thymoma:14,melanoma:4,urologic:4,lung:3,GI:2,other:1}[p.tumor] || 1, '真实世界证据');
+
+    if(p.ici==='PD-1'&&p.tumor==='thymoma') addR('PD-1 × 胸腺瘤交互模式',14,'真实世界证据');
+    else if(p.ici==='PD-1'&&['urologic','melanoma'].includes(p.tumor)) addR('癌种特异性交互模式',6,'真实世界证据');
+    else if(p.ici==='PD-L1'&&p.tumor==='melanoma') addR('PD-L1 黑色素瘤模式',7,'真实世界证据');
+    else if(p.ici==='CTLA-4'&&p.tumor==='urologic') addR('CTLA-4 泌尿系统肿瘤模式',7,'真实世界证据');
+
+    if(p.age<40) addR('年轻年龄保护模式',-8,'真实世界证据');
+    else if(p.ici==='PD-L1'&&p.age>=55) addR('年龄非线性效应', p.age<70?8:12,'真实世界证据');
+    else if(p.ici==='CTLA-4'&&p.age>=70) addR('年龄非线性效应',10,'真实世界证据');
+    else if(p.ici==='PD-1'&&p.age>=70) addR('年龄非线性效应',8,'真实世界证据');
+    else if(p.age>=65) addR('年龄影响',4,'真实世界证据');
+
+    if(['PD-1','CTLA-4','PD-1+CTLA-4'].includes(p.ici)&&p.weight<60) addR('低体重模式',7,'真实世界证据');
+    else if(p.ici==='PD-1'&&p.weight>95) addR('体重模式',-2,'真实世界证据');
+
+    const sW={weakness:14,ptosis:18,dysphagia:28,dyspnea:28,myalgia:10,palpitation:18};
+    p.symptoms.forEach(k=>addR(LABELS[k], sW[k]||0, '临床标准'));
+
+    const lW={CK:18,troponin:28,LFT:7,thyroid:5};
+    p.labs.forEach(k=>addR(LABELS[k], lW[k]||0, '临床标准'));
+
+    const iW={myositis:18,myocarditis:32,pneumonitis:18,colitis:10,vitiligo:1,endocrine:8};
+    p.iraes.forEach(k=>addR(LABELS[k], iW[k]||0, k==='vitiligo'?'真实世界证据':'临床标准'));
+
+    const respW={CR:35,PR:28,SD:12,PD:-10,NA:0}[p.response]||0;
+    if(respW) addB(`影像学疗效 ${p.response}`, respW, '临床标准');
+
+    if(p.iraes.includes('vitiligo')){
+      addB('白癜风相关潜在获益信号', 16 + (p.tumor==='melanoma'?7:3), '真实世界证据');
+    }
+
+    const ctW={down50:20,down:11,stable:3,up:-10,NA:0}[p.ctdna]||0;
+    if(ctW) addB('ctDNA 动态', ctW, '探索扩展');
+
+    const mW={down:10,stable:3,up:-7,NA:0}[p.marker]||0;
+    if(mW) addB('肿瘤标志物趋势',mW,'临床标准');
+
+    const eW={improved:9,stable:2,worse:-7}[p.ecog]||0;
+    if(eW) addB('ECOG 趋势', eW, '临床标准');
+
+    if(p.response==='PR' || p.response==='CR') addB('影像获益强化确认', 4, '临床标准');
+    if(p.day>60 && benefit>30) addB('治疗暴露持续性',4,'探索扩展');
+
+    const urgent = p.symptoms.some(x=>['dysphagia','dyspnea'].includes(x)) || p.labs.includes('troponin') || p.iraes.includes('myocarditis');
+    const completenessBase = 45;
+    const completeness = Math.max(25, Math.min(100,
+      completenessBase +
+      (p.response!=='NA'?12:0) +
+      (p.ctdna!=='NA'?12:0) +
+      (p.marker!=='NA'?8:0) +
+      ((p.symptoms.length+p.labs.length+p.iraes.length)>0?10:0) +
+      (p.center?4:0) + (p.cycle?4:0)
+    ));
+
+    risk = Math.max(0, Math.min(100, Math.round(risk)));
+    benefit = Math.max(0, Math.min(100, Math.round(benefit)));
+
+    let priority='常规', pill='status-low', bandR='低关注', bandB='有限信号';
+    if(risk>=70){priority='高优先级'; pill='status-high'; bandR='高关注'}
+    else if(risk>=40){priority='强化随访'; pill='status-mid'; bandR='中关注'}
+
+    if(benefit>=70) bandB='强信号';
+    else if(benefit>=40) bandB='中等信号';
+
+    return {
+      risk,benefit,urgent,completeness,priority,pill,bandR,bandB,
+      rd: rd.sort((a,b)=>Math.abs(b.w)-Math.abs(a.w)).slice(0,5),
+      bd: bd.sort((a,b)=>Math.abs(b.w)-Math.abs(a.w)).slice(0,5)
+    };
+  }
+
+  function setText(id, value){el(id).textContent = value}
+  function driverHTML(d){
+    const sign = d.w>0?'+':'';
+    return `<div class="driver"><div><strong>${d.label}</strong><small>${d.tier}</small></div><div class="mono">${sign}${d.w}</div></div>`;
+  }
+  function matrixText(r,b){
+    if(r>=50 && b>=50) return '象限：双高并存 · 安全优先';
+    if(r>=50 && b<50) return '象限：高风险 / 获益有限';
+    if(r<50 && b>=50) return '象限：低风险 / 获益增强';
+    return '象限：低风险 / 获益有限';
+  }
+  function riskDesc(score, urgent){
+    if(urgent) return '检测到高优先级安全信号，建议优先进行神经肌肉 / 心肌相关临床评估。';
+    if(score>=70) return '当前安全关注度高，建议缩短复核间隔并强化重点监测。';
+    if(score>=40) return '当前存在中等安全关注，建议强化症状、实验室与irAE复核。';
+    return '当前安全信号有限，建议继续常规监测。';
+  }
+  function benefitDesc(score){
+    if(score>=70) return '当前存在较强潜在获益证据，但仍需与安全风险分开独立解读。';
+    if(score>=40) return '当前存在中等获益证据，建议结合常规疗效评价持续观察。';
+    return '当前尚无强获益信号，仍需结合标准疗效评估。';
+  }
+  function updateProgress(p){
+    let std = 12, rwe = 28, exp = 8;
+    if(p.response!=='NA') std += 18;
+    if(p.marker!=='NA') std += 10;
+    if(p.symptoms.length || p.labs.length || p.iraes.some(x=>x!=='vitiligo')) std += 14;
+    if(p.iraes.includes('vitiligo')) rwe += 16;
+    if(p.ctdna!=='NA') exp += 18;
+    const total = std+rwe+exp;
+    const a = Math.round(std*100/total), b = Math.round(rwe*100/total), c = 100-a-b;
+    setText('pStd', a+'%'); setText('pRwe', b+'%'); setText('pExp', c+'%');
+    el('barStd').style.width = a+'%';
+    el('barRwe').style.width = b+'%';
+    el('barExp').style.width = c+'%';
+  }
+  function updateMatrix(risk, benefit){
+    const x = 72 + (536 * benefit / 100);
+    const y = 274 - (248 * risk / 100);
+    el('matrixPoint').setAttribute('cx', x.toFixed(1));
+    el('matrixPoint').setAttribute('cy', y.toFixed(1));
+    el('matrixLabel').setAttribute('x', Math.min(560, x+20).toFixed(1));
+    el('matrixLabel').setAttribute('y', Math.max(44, y+4).toFixed(1));
+    setText('matrixLabel', `R${risk} / B${benefit}`);
+    setText('matrixTag', matrixText(risk, benefit));
+  }
+  function drawTrend(p, s){
+    const c = el('trendCanvas');
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.clearRect(0,0,W,H);
+
+    const left = 58, right = W-16, top = 18, bottom = H-42;
+    const plotW = right-left, plotH = bottom-top;
+    const riskBase = Math.max(10, s.risk - (p.symptoms.length || p.labs.length || p.iraes.length ? 34 : 10));
+    const benefitBase = Math.max(8, s.benefit - ((p.response!=='NA' || p.ctdna!=='NA' || p.marker!=='NA' || p.iraes.includes('vitiligo')) ? 28 : 6));
+    const riskPts=[], benPts=[];
+    const n=7;
+    for(let i=0;i<n;i++){
+      const t=i/(n-1);
+      const ease=t*t*(3-2*t);
+      let rv = riskBase + (s.risk-riskBase)*ease + ((i===n-2 && p.symptoms.length)?4:0);
+      let bv = benefitBase + (s.benefit-benefitBase)*ease + ((i===2 && p.iraes.includes('vitiligo'))?5:0);
+      rv = Math.max(0,Math.min(100,rv));
+      bv = Math.max(0,Math.min(100,bv));
+      riskPts.push(rv); benPts.push(bv);
+    }
+
+    ctx.fillStyle = '#ffffff';
+    roundRect(ctx, left, top, plotW, plotH, 18, true, false);
+    ctx.strokeStyle = '#d9e4ec';
+    ctx.stroke();
+
+    ctx.strokeStyle = '#d9e4ec';
+    ctx.setLineDash([5,6]);
+    [0,25,50,75,100].forEach(v=>{
+      const y = bottom - plotH*v/100;
+      ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(right,y); ctx.stroke();
+      ctx.fillStyle = '#7a909c'; ctx.font = '12px sans-serif';
+      ctx.fillText(String(v), 14, y+4);
+    });
+    ctx.setLineDash([]);
+    ctx.fillText('指数', 14, 16);
+
+    const labels = ['第0天', '第'+Math.round(p.day*0.2)+'天', '第'+Math.round(p.day*0.4)+'天', '第'+Math.round(p.day*0.6)+'天', '第'+Math.round(p.day*0.8)+'天', '第'+Math.round(p.day*0.9)+'天', '第'+p.day+'天'];
+    labels.forEach((lab,i)=>{
+      const x = left + plotW*i/(n-1);
+      ctx.fillStyle = '#7a909c'; ctx.font = '12px sans-serif';
+      ctx.fillText(lab, x-20, H-16);
+      ctx.strokeStyle = '#edf2f6'; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+    });
+
+    drawSeries(ctx, riskPts, left, right, top, bottom, '#d86f7e');
+    drawSeries(ctx, benPts, left, right, top, bottom, '#3d69ff');
+
+    ctx.fillStyle = '#d86f7e'; ctx.beginPath(); ctx.arc(W-168, 24, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#324a5b'; ctx.fillText('风险', W-156, 28);
+    ctx.fillStyle = '#3d69ff'; ctx.beginPath(); ctx.arc(W-96, 24, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#324a5b'; ctx.fillText('获益', W-84, 28);
+  }
+  function roundRect(ctx,x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    if(fill) ctx.fill();
+    if(stroke) ctx.stroke();
+  }
+  function drawSeries(ctx, arr, left,right,top,bottom,color){
+    const n=arr.length, plotW=right-left, plotH=bottom-top;
+    ctx.strokeStyle=color; ctx.lineWidth=3;
+    ctx.beginPath();
+    arr.forEach((v,i)=>{
+      const x = left + plotW*i/(n-1);
+      const y = bottom - plotH*v/100;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    arr.forEach((v,i)=>{
+      const x = left + plotW*i/(n-1);
+      const y = bottom - plotH*v/100;
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke();
+    });
+  }
+  function updateTimeline(p,s){
+    const list = [];
+    list.push({day:'第0天', title:'ICI治疗启动', body:`患者开始接受 ${p.ici} 治疗，${LABELS[p.tumor]} 相关基线信息已纳入双哨兵管理流程。`});
+    list.push({day:'第'+Math.max(7, Math.round(p.day*0.35))+'天', title:'早期监测节点', body: p.symptoms.length || p.labs.length ? '随访中出现早期安全相关线索，系统提示需要更加密切复核。' : '未发现明显早期安全信号，继续常规随访路径。'});
+    if(p.iraes.includes('vitiligo')){
+      list.push({day:'第'+Math.max(14, Math.round(p.day*0.55))+'天', title:'潜在获益相关信号', body:'检测到白癜风样改变，系统将其作为潜在获益相关信号保留，但不会替代标准疗效评价。'});
+    }
+    if(p.symptoms.length || p.labs.includes('troponin') || p.iraes.includes('myocarditis')){
+      list.push({day:'第'+Math.max(18, Math.round(p.day*0.75))+'天', title:'安全优先节点', body:'由于神经肌肉症状 / 实验室异常 / 心肌相关信号出现，风险哨兵上调，系统提示优先进行临床安全评估。'});
+    } else {
+      list.push({day:'第'+Math.max(18, Math.round(p.day*0.75))+'天', title:'疗效复核节点', body:'平台继续整合影像、标志物及患者状态，对获益轴进行动态更新。'});
+    }
+    list.push({day:'第'+p.day+'天', title:'当前状态快照', body:`当前结果：风险 ${s.risk}/100（${s.bandR}），获益 ${s.benefit}/100（${s.bandB}）。`});
+    el('timelineList').innerHTML = list.map(item=>`
+      <div style="display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:start">
+        <div style="padding:10px 12px;border-radius:14px;background:#eff8f9;border:1px solid #cdeaea;color:#0d7f87;font-weight:700;text-align:center">${item.day}</div>
+        <div style="padding:12px 14px;border:1px solid var(--stroke);border-radius:18px;background:#fcfeff">
+          <div style="font-weight:700">${item.title}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">${item.body}</div>
+        </div>
+      </div>`).join('');
+  }
+  function buildReport(p,s){
+    const riskTop = s.rd.length? s.rd.map(x=>x.label).join('、') : '暂无突出风险驱动';
+    const benTop = s.bd.length? s.bd.map(x=>x.label).join('、') : '暂无强获益信号';
+    return `【ICI-Guard 综合评估摘要】
+
+患者编号：${p.patientId}
+中心：${p.center}
+ICI方案：${p.ici}
+肿瘤类型：${LABELS[p.tumor]}
+年龄 / 体重：${p.age} 岁 / ${p.weight} kg
+治疗天数 / 周期：第 ${p.day} 天 / 第 ${p.cycle} 周期
+
+一、风险哨兵
+- 指数：${s.risk}/100
+- 分层：${s.bandR}
+- 主要驱动：${riskTop}
+
+二、获益哨兵
+- 指数：${s.benefit}/100
+- 分层：${s.bandB}
+- 主要驱动：${benTop}
+
+三、综合解释
+本平台采用“风险轴—获益轴”双轴独立输出逻辑。即使出现白癜风等潜在获益相关信号，也不会抵消高风险安全信号。当前数据完整度为 ${s.completeness}% ，随访优先级为“${s.priority}”。
+
+四、证据与管理说明
+系统采用可解释规则与证据分级结构，将真实世界研究结论转化为医院端风险管理与随访支持。当前以MG和白癜风作为首批锚点，后续可持续扩展至心肌炎、肌炎、影像、ctDNA、肿瘤标志物及多中心验证体系。
+
+五、使用边界
+本结果用于风险识别、证据整合与随访辅助，不替代医师独立诊断、处方、停药或治疗决策。`;
+  }
+  function loadComplexScenario(){
+    applyPreset('dual');
+    el('patientId').value = 'IG-CASE-0042';
+    el('center').value = '肿瘤免疫治疗中心';
+    update();
+  }
+  function applyPreset(name){
+    const p = presets[name];
+    if(!p) return;
+    el('ici').value = p.ici;
+    el('tumor').value = p.tumor;
+    el('age').value = p.age;
+    el('weight').value = p.weight;
+    el('day').value = p.day;
+    el('cycle').value = p.cycle;
+    el('response').value = p.response;
+    el('ctdna').value = p.ctdna;
+    el('marker').value = p.marker;
+    el('ecog').value = p.ecog;
+    state.symptoms = new Set(p.symptoms);
+    state.labs = new Set(p.labs);
+    state.iraes = new Set(p.iraes);
+    setChipState();
+    update();
+  }
+  function update(){
+    const p=read();
+    const s=score(p);
+
+    setText('kpiRisk', s.risk);
+    setText('kpiBenefit', s.benefit);
+    setText('kpiComplete', s.completeness + '%');
+    setText('kpiPriority', s.urgent ? '安全优先' : s.priority);
+
+    el('riskGauge').style.setProperty('--val', s.risk);
+    el('benefitGauge').style.setProperty('--val', s.benefit);
+    setText('riskNum', s.risk);
+    setText('benefitNum', s.benefit);
+    setText('riskBand', s.bandR);
+    setText('benefitBand', s.bandB);
+    setText('riskDesc', riskDesc(s.risk, s.urgent));
+    setText('benefitDesc', benefitDesc(s.benefit));
+    setText('riskBadge', s.urgent ? '建议优先安全评估' : '安全优先始终保留');
+    setText('benefitBadge', '获益信号不能抵消风险');
+    el('riskDrivers').innerHTML = (s.rd.length?s.rd:[{label:'暂无突出风险驱动',w:0,tier:'—'}]).map(driverHTML).join('');
+    el('benefitDrivers').innerHTML = (s.bd.length?s.bd:[{label:'暂无突出获益驱动',w:0,tier:'—'}]).map(driverHTML).join('');
+
+    const pill = el('priorityPill');
+    pill.className = 'status-pill ' + (s.urgent ? 'status-high' : s.pill);
+    pill.textContent = s.urgent ? '安全优先评估' : s.priority;
+
+    updateMatrix(s.risk, s.benefit);
+    updateProgress(p);
+    setText('profPatient', p.patientId);
+    setText('profRegimen', p.ici);
+    setText('profTumor', LABELS[p.tumor]);
+    setText('profDay', String(p.day));
+    setText('profCycle', String(p.cycle));
+
+    drawTrend(p,s);
+    updateTimeline(p,s);
+
+    el('ev1').textContent = `当前系统已将 ${p.ici}、${LABELS[p.tumor]}、年龄/体重模式及共现不良事件纳入风险锚点逻辑。`;
+    el('ev2').textContent = p.iraes.includes('vitiligo')
+      ? '当前已录入白癜风样改变，系统将其作为潜在获益相关信号纳入获益轴，但不会将其视为疗效替代终点。'
+      : '当前未录入白癜风样改变，但平台结构已预留其作为潜在获益相关信号的入口。';
+    el('ev3').textContent = p.response==='NA'
+      ? '当前尚未录入影像疗效信息，因此临床标准获益证据仍不完整。'
+      : `当前影像学最佳疗效为 ${p.response}，已作为临床标准层的重要输入增强获益轴。`;
+    el('ev4').textContent = p.ctdna==='NA'
+      ? '当前未录入ctDNA信息，分子层证据可在后续随访中补充。'
+      : `当前ctDNA趋势为“${{'down50':'下降 ≥50%','down':'下降 10–49%','stable':'基本稳定','up':'上升'}[p.ctdna]}”，已作为分子层补充证据纳入获益轴。`;
+    el('ev5').textContent = '平台架构可进一步纳入心肌炎、肌炎、影像、标志物、ctDNA及多中心验证数据，形成持续迭代的医院端管理体系。';
+    el('ev6').textContent = '本平台输出关注等级、证据提示与随访任务，不自动给出MG诊断、停药决策或处方指令。';
+
+    const nextDays = s.urgent ? 1 : s.risk>=70 ? 3 : s.risk>=40 ? 7 : 14;
+    setText('taskNow',
+      s.urgent
+      ? '已触发高优先级安全复核路径。系统保留获益信号，但提示当前应优先处理安全问题。'
+      : s.risk>=70
+      ? '建议缩短复核间隔，并围绕当前主要风险驱动进行重点监测。'
+      : s.risk>=40
+      ? '建议强化随访，重点复核新发症状、实验室变化及免疫相关事件。'
+      : '建议维持常规随访，并持续完善结构化数据采集。'
+    );
+    setText('taskNext', `建议下一个随访节点：${nextDays} 天内。优先补全项目：${p.response==='NA'?'影像学疗效、 ':''}${p.ctdna==='NA'?'ctDNA、 ':''}${p.marker==='NA'?'肿瘤标志物趋势、 ':''}更新症状/实验室动态。`);
+    setText('taskData', `当前数据完整度为 ${s.completeness}% 。平台后续可基于结果回流进行本地校准、阈值优化和多中心迭代。`);
+
+    el('reportBox').value = buildReport(p,s);
+  }
+
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const profile = btn.dataset.tab === 'profile';
+      el('tabProfile').classList.toggle('hidden', !profile);
+      el('tabMatrix').classList.toggle('hidden', profile);
+    });
+  });
+
+  document.querySelectorAll('input, select, textarea').forEach(node=>{
+    node.addEventListener('input', update);
+    node.addEventListener('change', update);
+  });
+  document.querySelectorAll('[data-preset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>applyPreset(btn.dataset.preset));
+  });
+  el('runBtn').addEventListener('click', update);
+  el('runNowTop').addEventListener('click', ()=>{ update(); window.scrollTo({top:document.getElementById('matrix').offsetTop-20, behavior:'smooth'});});
+  el('resetBtn').addEventListener('click', ()=>applyPreset('stable'));
+  el('scenarioBtn').addEventListener('click', loadComplexScenario);
+  el('copySummaryBtn').addEventListener('click', async ()=>{
+    const text = el('reportBox').value;
+    const btn = el('copySummaryBtn');
+    let copied = false;
+    try{
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      }
+    }catch(e){}
+    if(!copied){
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.setAttribute('readonly','');
+      temp.style.position='fixed';
+      temp.style.opacity='0';
+      document.body.appendChild(temp);
+      temp.select();
+      try{ copied = document.execCommand('copy'); }catch(e){}
+      temp.remove();
+    }
+    const old = btn.textContent;
+    btn.textContent = copied ? '已复制' : '请手动复制';
+    setTimeout(()=>btn.textContent=old, 1400);
+  });
+  let focusMode=false;
+  el('focusModeBtn').addEventListener('click', ()=>{
+    focusMode = !focusMode;
+    document.querySelector('.shell').classList.toggle('focus-mode', focusMode);
+    el('focusModeBtn').textContent = focusMode ? '退出专注' : '专注模式';
+  });
+
+  initChips();
+  applyPreset('stable');
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"45c2bf8136a245cd97f1c2e9a96c0730","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
